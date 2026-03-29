@@ -1,17 +1,29 @@
-#!/usr/bin/env python3
-"""rot13_tool - ROT13/ROTn encoding."""
-import sys,argparse,json
-def rotn(text,n=13):
-    r=[]
+import sys, argparse
+
+def caesar(text, shift):
+    result = []
     for c in text:
         if c.isalpha():
-            b=ord("A") if c.isupper() else ord("a")
-            r.append(chr((ord(c)-b+n)%26+b))
-        else:r.append(c)
-    return "".join(r)
+            base = ord("A") if c.isupper() else ord("a")
+            result.append(chr((ord(c) - base + shift) % 26 + base))
+        else:
+            result.append(c)
+    return "".join(result)
+
 def main():
-    p=argparse.ArgumentParser(description="ROT13/ROTn")
-    p.add_argument("text");p.add_argument("-n",type=int,default=13)
-    args=p.parse_args()
-    print(json.dumps({"input":args.text,"n":args.n,"output":rotn(args.text,args.n)}))
-if __name__=="__main__":main()
+    p = argparse.ArgumentParser(description="ROT13 / Caesar cipher")
+    p.add_argument("text", nargs="?")
+    p.add_argument("-s", "--shift", type=int, default=13)
+    p.add_argument("-d", "--decode", action="store_true")
+    p.add_argument("--brute", action="store_true", help="Try all 26 shifts")
+    args = p.parse_args()
+    text = args.text or sys.stdin.read().strip()
+    if args.brute:
+        for i in range(26):
+            print(f"ROT-{i:2d}: {caesar(text, i)}")
+    else:
+        shift = -args.shift if args.decode else args.shift
+        print(caesar(text, shift))
+
+if __name__ == "__main__":
+    main()
