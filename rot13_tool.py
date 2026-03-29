@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""rot13_tool - ROT13 and arbitrary rotation cipher."""
-import sys
-
-def rot(text, n=13):
-    result = []
+"""rot13_tool - ROT13/ROTn encoding."""
+import sys,argparse,json
+def rotn(text,n=13):
+    r=[]
     for c in text:
         if c.isalpha():
-            base = ord("A") if c.isupper() else ord("a")
-            result.append(chr((ord(c) - base + n) % 26 + base))
-        else: result.append(c)
-    return "".join(result)
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2: print("Usage: rot13_tool <text> [n]"); sys.exit(1)
-    n = int(sys.argv[-1]) if len(sys.argv) > 2 and sys.argv[-1].isdigit() else 13
-    text = " ".join(sys.argv[1:] if n == 13 else sys.argv[1:-1])
-    print(rot(text, n))
+            b=ord("A") if c.isupper() else ord("a")
+            r.append(chr((ord(c)-b+n)%26+b))
+        else:r.append(c)
+    return "".join(r)
+def main():
+    p=argparse.ArgumentParser(description="ROT13/ROTn")
+    p.add_argument("text");p.add_argument("-n",type=int,default=13)
+    args=p.parse_args()
+    print(json.dumps({"input":args.text,"n":args.n,"output":rotn(args.text,args.n)}))
+if __name__=="__main__":main()
